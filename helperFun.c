@@ -163,6 +163,7 @@ void ImgToPgm(FILE *file, Img *img1){
             fwrite(write_buf, sizeof(char), j, file);
             j = 0;
         }
+            temp = *((img1 -> data) + i);
         j += snprintf(write_buf + j, 6, "%d ", temp);
         write_buf[j] = ' ';
         j++;

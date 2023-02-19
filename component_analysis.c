@@ -188,7 +188,8 @@ void setBoundBox(Img *img){
         }
     }
     end:
-    printf("[%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d]",
+    printf("BoundBox starting top left going clockwise\n"
+           "[%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d]",
            img->boundBox[0],
            img->boundBox[1],
            img->boundBox[2],
@@ -220,8 +221,9 @@ int isPerimeter(Img *img, int i, int j){
 
 void setPerimeter(Img *img) {
 
-    int perimeter = 0;
+    double perimeter = 0;
 
+    //starting at boundbox [0,1] ensures we are top left and algo will go clockwise
     int currentx = img->boundBox[0];
     int currenty = img->boundBox[1];
     int startx = img->boundBox[0];
@@ -233,14 +235,13 @@ void setPerimeter(Img *img) {
             currentx += (DIRECTION[i])[0];
             currentx += (DIRECTION[i])[1];
             i -= 3;
-            putVal(img, currentx, currenty, 200);
+            putVal(img, currentx, currenty, 150);
             break;
         }
     }
-    while (currentx != startx || currenty != starty) {
-        for (;; i = (i + 1) % 8) {
-            if (getVal(img, currentx + (DIRECTION[i])[0], currenty + (DIRECTION[i])[1], 0) != 0
-            && isPerimeter(img, currentx + (DIRECTION[i])[0], currenty + (DIRECTION[i])[1])) {
+
+        for (;currentx != startx || currenty != starty; i = (i + 1) % 8) {
+            if (getVal(img, currentx + (DIRECTION[i])[0], currenty + (DIRECTION[i])[1], 0) != 0) {
                 currentx += (DIRECTION[i])[0];
                 currenty += (DIRECTION[i])[1];
                 if(i % 2 == 0)
@@ -248,11 +249,14 @@ void setPerimeter(Img *img) {
                 else
                     perimeter += 1;
                 i = (i + 5) % 8;
-                putVal(img, currentx, currenty, 200);
-                break;
-            }
+                putVal(img, currentx, currenty, 150);
         }
     }
+    if(i % 2 == 0)
+        perimeter += sqrt(2);
+    else
+        perimeter += 1;
+
     printf("perimeter %d\n", perimeter);
     img->perimeter = perimeter;
 }
@@ -327,7 +331,8 @@ Img * setAllComponent(Img *img, unsigned char comp){
     setC1(component);
     setC2(component);
     setSOMoment(component);
-    FILE *file = fopen("out3.pgm", "w");
-    ImgToPgm(file, component);
-    fclose(file);
+    FILE *fp = fopen("output/out3.pgm", "w");
+    ImgToPgm(fp, component);
+    fclose(fp);
+    return component;
 }
