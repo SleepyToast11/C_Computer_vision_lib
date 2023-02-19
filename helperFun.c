@@ -12,6 +12,7 @@
 void destroyImg(Img *img){
     free(img -> data);
     free(img -> header);
+    free(img -> boundBox);
     free(img);
 }
 
@@ -20,6 +21,7 @@ Img * copyImg(Img *img){
 
 
     ret -> header = malloc(100 * sizeof (char));
+
     memcpy(ret -> header, img -> header, 100);
 
     ret -> width = img -> width;
@@ -27,7 +29,7 @@ Img * copyImg(Img *img){
     ret -> headerSize = img -> headerSize;
 
     ret -> data = malloc(sizeof (char) * ret -> height * ret -> width);
-    memcpy(ret -> data, img -> data, sizeof (char) * ret -> height * ret -> width);
+    memcpy((ret -> data), (img -> data), sizeof (unsigned char) * ret -> height * ret -> width);
 
     return ret;
 }
@@ -150,30 +152,7 @@ Img* pgmExtractor(FILE **pFile){
     return ret;
 }
 
-void imgToPgm(FILE *file, Img *img1){
-    fwrite(img1 -> header, sizeof(char), (img1 -> headerSize), file);
-    int size = (img1 -> height) * (img1 -> width);
-    char write_buf[1024];
-    int j = 0;
-
-    for(int i = 0; i < size; i++){
-        if(j + 10 > 1024){
-            fwrite(write_buf, sizeof(char), j, file);
-            j = 0;
-        }
-        j += snprintf(write_buf + j, 6, "%d ", *((img1 -> data) + i));
-        write_buf[j] = ' ';
-        j++;
-        if((i + 1) % img1 -> width == 0 && i != 0)
-            write_buf[j] = '\n';
-        else
-            write_buf[j] = ' ';
-        j++;
-    }
-    fwrite(write_buf, sizeof(char), j, file);
-}
-
-void compImgToPgm(FILE *file, Img *img1, unsigned char comp){
+void ImgToPgm(FILE *file, Img *img1){
     fwrite(img1 -> header, sizeof(char), (img1 -> headerSize), file);
     int size = (img1 -> height) * (img1 -> width);
     char write_buf[1024];
@@ -184,10 +163,6 @@ void compImgToPgm(FILE *file, Img *img1, unsigned char comp){
             fwrite(write_buf, sizeof(char), j, file);
             j = 0;
         }
-        if(*((img1 -> data) + i) == comp)
-            temp = *((img1 -> data) + i);
-        else
-            temp = 0;
         j += snprintf(write_buf + j, 6, "%d ", temp);
         write_buf[j] = ' ';
         j++;
@@ -200,7 +175,11 @@ void compImgToPgm(FILE *file, Img *img1, unsigned char comp){
     fwrite(write_buf, sizeof(char), j, file);
 }
 
-
+void outImg(FILE *file, Img *img){
+    blowOutColour(img);
+    ImgToPgm(file, img);
+    toZeroAndOne(img);
+}
 
 Img* pgmToImg(FILE *img){
     if(img == 0)

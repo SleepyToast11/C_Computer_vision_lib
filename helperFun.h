@@ -3,6 +3,7 @@
 //
 
 #ifndef FUNTIMES_HELPERFUN_H
+
 #define FUNTIMES_HELPERFUN_H
 
 
@@ -15,9 +16,24 @@ typedef struct {
         int width;
         char *header;
         int headerSize;
+        int numOfComp;
+        double centroidr;
+        double centroidc;
+        int area;
+        int *boundBox; //clockwise starting from top left
+        double SOMonentr;
+        double SOMonentc;
+        double SOMonentm;
+        double perimeter;
+        double C1;
+        double C2;
     } Img;
 
+
+
 #endif //FUNTIMES_HELPERFUN_H
+void ImgToPgm(FILE *file, Img *img1);
+void outImg(FILE *file, Img *img);
 void destroyImg(Img *img);
 void thresholdHelper(Img* img1);
 unsigned char getVal(Img *img, int x, int y, unsigned char defaultVal);
@@ -42,16 +58,14 @@ void pgmHelper(char *buf, int mode);
 
 Img* pgmExtractor(FILE **pFile);
 
-void imgToPgm(FILE *file, Img *img1);
-
 Img* pgmToImg(FILE *img);
 
-inline unsigned char findRoot(unsigned char *tree, unsigned char node);
+unsigned char findRoot(unsigned char *tree, unsigned char node);
 
 void simplify(Img *img, unsigned char *tree, unsigned char *ptr);
 
 int label(Img *img);
 
 
-
-
+Img * getComp(Img *img, unsigned char compNum);
+Img * setAllComponent(Img *img, unsigned char comp);

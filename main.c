@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "helperFun.h"
+#include <math.h>
+
 /* for reference
     struct img{
         char *data;
@@ -10,13 +12,6 @@
         char *header;
     };
  */
-
-
-void outImg(FILE *file, Img *img){
-    blowOutColour(img);
-    imgToPgm(file, img);
-    toZeroAndOne(img);
-}
 
 int main() {
     printf("enter full name of file: \n");
@@ -51,13 +46,15 @@ int main() {
     //errode(data, 2);
 
     printf("%d\n", label(data));
-    printf("%d", numberOfObj(data));
 
     thresholdHelper(data);
 
 
-    imgToPgm(fp1, data);
+    ImgToPgm(fp1, data);
     fclose(fp1);
+
+    Img *comp = setAllComponent(data, 1);
+    destroyImg(comp);
 
     destroyImg(data);
     return 0;

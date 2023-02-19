@@ -25,7 +25,9 @@ void minComponentSize(Img* img, unsigned char *tree, unsigned char *ptr, int com
             tree[i] = i;
     }
 
-    for(int i = 2; i < 256; i++)
+    *ptr = 1; //since no obj can have 1 as index, we can now use the first index of 1 simplifying future algos.
+
+    for(int i = 2; i < 256; i++) //here we start using the first comp as 1
         if(tree[i] != 0) {
             fun[i] = *ptr;
             tree[*ptr] = *ptr;
@@ -57,7 +59,6 @@ void simplify(Img *img, unsigned char *tree, unsigned char *ptr){
     perPixelTransformation(img, tree);
     *ptr = 2;
     unsigned char newTree[256] = { 0 };
-    newTree[1] = 1;
 
     for(int i = 2; i < 256; i++)
         if(tree[i] == (unsigned char) i) {
@@ -75,7 +76,7 @@ void simplify(Img *img, unsigned char *tree, unsigned char *ptr){
 int label(Img *img){
     unsigned char tree[256] = { 0 };
     unsigned char ptr = 2;
-    unsigned char tmp0, tmp1, tmp2;
+    unsigned char tmp0, tmp1, tmp2, tmp3, tmp4, tmp5;
 
     for(int i = 0; i < img -> height; i++){
         for(int j = 0; j < img -> width; j++){
@@ -84,31 +85,58 @@ int label(Img *img){
 
                 tmp0 = getVal(img, j - 1, i, 0);
                 tmp1 = getVal(img, j, i - 1, 0);
+                tmp3 = getVal(img, j - 1, i - 1, 0);
+                tmp4 = getVal(img, j + 1, i - 1, 0);
+                tmp2 = 0;
 
-                if (tmp0 == 0 && tmp1 == 0){
+                if (tmp0 == 0 && tmp1 == 0 && tmp3 == 0 && tmp4 == 0){
                     tree[ptr] = ptr;
                     putVal(img, j, i, ptr);
                     ptr++;
                     if(ptr == 255)
                         simplify(img, tree, &ptr);
                 }
+                else{
+                if(tmp0 != 0){
+                    putVal(img, j, i, findRoot(tree, tmp0));
+                    tmp2 = findRoot(tree, tmp0);
+                }
 
-                else if(tmp0 != tmp1){
-                    if(tmp0 == 0)
+                if(tmp1 != 0){
+                    if(tmp2 == 0){
                         putVal(img, j, i, findRoot(tree, tmp1));
-                    else if(tmp1 == 0)
-                        putVal(img, j, i, findRoot(tree, tmp0));
-                    else {
                         tmp2 = findRoot(tree, tmp1);
-                        tree[tmp0] = tmp2;
-                        putVal(img, j, i, tmp2);
                     }
-                } else
-                    putVal(img, j, i, findRoot(tree, tmp1));
+                    else{
+                        tree[tmp1] = tmp2;
+                    }
+                }
+
+                    if(tmp3 != 0){
+                        if(tmp2 == 0){
+                            putVal(img, j, i, findRoot(tree, tmp3));
+                            tmp2 = findRoot(tree, tmp3);
+                        }
+                        else{
+                            tree[tmp3] = tmp2;
+                        }
+                    }
+
+                if(tmp4 != 0){
+                    if(tmp2 == 0) {
+                        putVal(img, j, i, findRoot(tree, tmp4));
+                        tmp2 = findRoot(tree, tmp4);
+                    }
+                    else{
+                        tree[tmp4] = tmp2;
+                    }
+                }
+                }
             }
         }
-    }
+        }
     simplify(img, tree, &ptr);
-    minComponentSize(img, tree, &ptr, 20);
-    return ((int) ptr - 2);
+    minComponentSize(img, tree, &ptr, 0);
+    img -> numOfComp = ptr;
+    return ((int) ptr - 1);
 }
