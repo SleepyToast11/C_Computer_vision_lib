@@ -12,13 +12,14 @@
 void destroyImg(Img *img){
     free(img -> data);
     free(img -> header);
-    free(img -> boundBox);
+    if(img -> boundboxPresent)
+        free(img -> boundBox);
     free(img);
 }
 
 Img * copyImg(Img *img){
     Img *ret = malloc(sizeof (Img));
-
+    ret -> boundboxPresent = 0;
 
     ret -> header = malloc(100 * sizeof (char));
 
@@ -84,12 +85,13 @@ unsigned char* pgmToArray(FILE **img, int height, int width){
     }
     return arr;
 }
-#pragma clang diagnostic pop
+
 
 //could be improved visually by separating repeating elements in separate functions, ain't feeling like it
 Img* pgmExtractor(FILE **pFile){
      Img *ret;
     ret = malloc(sizeof( Img));
+    ret -> boundboxPresent = 0;
     char buf[1];
     char *header; //null terminated header
     header = malloc(100 * sizeof (char));
@@ -187,3 +189,4 @@ Img* pgmToImg(FILE *img){
         exit(-1);
     return pgmExtractor(&img);
 }
+
