@@ -136,7 +136,7 @@ int label(Img *img){
         }
         }
     simplify(img, tree, &ptr);
-    minComponentSize(img, tree, &ptr, 0);
+    minComponentSize(img, tree, &ptr, 20);
     img -> numOfComp = ptr;
     return ((int) ptr - 1);
 }

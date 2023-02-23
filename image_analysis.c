@@ -6,7 +6,6 @@ void thresholdHelper(Img* img1){
     int arr[256] = { 0 };
     float arrRel[256];
     int sum = 0;
-    memset(arr, 0, 256 * sizeof (int));
     int size = (img1 -> width) * (img1 -> height);
     int j;
     for(int i = 0; i < size; i++){
@@ -15,48 +14,11 @@ void thresholdHelper(Img* img1){
         sum++;
     }
 
+
     for(int i = 0; i < 256; i++)
-        arrRel[i] = (float) arr[i] / (float)sum;
-    int k;
-    for(int i = 0; i < 256; i++) {
-        k = i;
-        j = 8;
-        printf("%d", k);
-        if(k == 0)
-            j--;
-        while(k != 0){
-            j--;
-            k /= 10;
-        }
-        for(; j > 0; j--){
-            printf(" ");
-        }
-    }
-    printf("\n");
-    //slow, I know
-    for(int i = 0; i < 256; i++) {
-        j = 8;
-        printf("%d", arr[i]);
+        printf("%d\t %d\t%.3f\n", i, arr[i], arr[i] / (float)sum);
 
-        if (arr[i] == 0)
-            j--;
 
-        while(arr[i] != 0){
-            j--;
-            arr[i] /= 10;
-        }
-        for(; j > 0; j--){
-            printf(" ");
-        }
-    }
-    printf("\n");
-    for(int i = 0; i < 256; i++) {
-
-        printf("%.4f", arrRel[i]);
-
-        printf("  ");
-    }
-    printf("\n");
 }
 
 void putVal(Img *img, int x, int y, unsigned char val){

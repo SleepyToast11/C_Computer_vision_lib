@@ -20,6 +20,7 @@ typedef struct {
         double centroidr;
         double centroidc;
         int area;
+        int boundboxPresent;
         int *boundBox; //clockwise starting from top left
         double SOMonentr;
         double SOMonentc;
@@ -54,8 +55,6 @@ Img * copyImg(Img *img);
 //takes a ptr to an opened and  pgm file and returns a ptr to an array and
 unsigned char* pgmToArray(FILE **img, int height, int width);
 
-void pgmHelper(char *buf, int mode);
-
 Img* pgmExtractor(FILE **pFile);
 
 Img* pgmToImg(FILE *img);
@@ -66,6 +65,7 @@ void simplify(Img *img, unsigned char *tree, unsigned char *ptr);
 
 int label(Img *img);
 
+void compsToPGN(Img *img, Img *original);
 
 Img * getComp(Img *img, unsigned char compNum);
 Img * setAllComponent(Img *img, unsigned char comp);

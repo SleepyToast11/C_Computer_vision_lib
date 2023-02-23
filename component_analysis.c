@@ -55,11 +55,12 @@ void setCentroid(Img *img){
 
 }
 
-void setBoundBox(Img *img){
-    img -> boundBox = malloc(16 * sizeof (int));
+void setBoundBox(Img *img) {
+    img->boundboxPresent = 1;
+    img->boundBox = malloc(16 * sizeof(int));
     int ptr = 0;
-    for(int i = 0; i < img -> height;){
-        for(int j = 0; j < img -> width;) {
+    for (int i = 0; i < img->height;) {
+        for (int j = 0; j < img->width;) {
             switch (ptr) {
                 case 0:
                     if (*(img->data + i * img->width + j) != 0) {
@@ -78,9 +79,8 @@ void setBoundBox(Img *img){
                         img->boundBox[3] = i;
                         putVal(img, j, i, 255);
                         ptr = 2;
-                        i = img -> height - 1;
-                    }
-                    else
+                        i = img->height - 1;
+                    } else
                         j--;
                     break;
                 case 2:
@@ -100,8 +100,7 @@ void setBoundBox(Img *img){
                         putVal(img, j, i, 255);
                         ptr = 4;
                         goto vertical;
-                    }
-                    else
+                    } else
                         j--;
                     break;
                 default:
@@ -124,14 +123,14 @@ void setBoundBox(Img *img){
     }
     exit(2);
     vertical:
-    for(int i = 0; i < img -> width;){
-        for(int j = 0; j < img -> height;) {
+    for (int i = 0; i < img->width;) {
+        for (int j = 0; j < img->height;) {
             switch (ptr) {
                 case 4:
-                    if (*(img->data + (i * img->width + j)) != 0) {
+                    if (*(img->data + (j * img->width + i)) != 0) {
                         img->boundBox[14] = i;
                         img->boundBox[15] = j;
-                        putVal(img, j, i, 255);
+                        putVal(img, i, j, 255);
                         j = img->height - 1;
                         ptr = 5;
                         break;
@@ -139,34 +138,32 @@ void setBoundBox(Img *img){
                         j++;
                     break;
                 case 5:
-                    if (*(img->data + (i * img->width + j)) != 0) {
+                    if (*(img->data + (j * img->width + i)) != 0) {
                         img->boundBox[12] = i;
                         img->boundBox[13] = j;
                         ptr = 6;
-                        putVal(img, j, i, 255);
-                        i = img -> width -1;
-                    }
-                    else
+                        putVal(img, i, j, 255);
+                        i = img->width - 1;
+                    } else
                         j--;
                     break;
                 case 6:
-                    if (*(img->data + (i * img->width + j)) != 0) {
+                    if (*(img->data + (j * img->width + i)) != 0) {
                         img->boundBox[4] = i;
                         img->boundBox[5] = j;
-                        putVal(img, j, i, 255);
+                        putVal(img, i, j, 255);
                         j = img->height - 1;
                         ptr = 7;
                     } else
                         j++;
                     break;
                 case 7:
-                    if (*(img->data + (i * img->width + j)) != 0) {
+                    if (*(img->data + (j * img->width + i)) != 0) {
                         img->boundBox[6] = i;
                         img->boundBox[7] = j;
-                        putVal(img, j, i, 255);
+                        putVal(img, i, j, 255);
                         goto end;
-                    }
-                    else
+                    } else
                         j--;
                     break;
                 default:
@@ -188,24 +185,6 @@ void setBoundBox(Img *img){
         }
     }
     end:
-    printf("BoundBox starting top left going clockwise\n"
-           "[%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d], [%d, %d]",
-           img->boundBox[0],
-           img->boundBox[1],
-           img->boundBox[2],
-           img->boundBox[3],
-           img->boundBox[4],
-           img->boundBox[5],
-           img->boundBox[6],
-           img->boundBox[7],
-           img->boundBox[8],
-           img->boundBox[9],
-           img->boundBox[10],
-           img->boundBox[11],
-           img->boundBox[12],
-           img->boundBox[13],
-           img->boundBox[14],
-           img->boundBox[15]); //for debugging purpose
 }
 
 int isPerimeter(Img *img, int i, int j){
@@ -235,7 +214,7 @@ void setPerimeter(Img *img) {
             currentx += (DIRECTION[i])[0];
             currentx += (DIRECTION[i])[1];
             i -= 3;
-            putVal(img, currentx, currenty, 150);
+            putVal(img, currentx, currenty, 200);
             break;
         }
     }
@@ -249,7 +228,7 @@ void setPerimeter(Img *img) {
                 else
                     perimeter += 1;
                 i = (i + 5) % 8;
-                putVal(img, currentx, currenty, 150);
+                putVal(img, currentx, currenty, 200);
         }
     }
     if(i % 2 == 0)
@@ -257,7 +236,6 @@ void setPerimeter(Img *img) {
     else
         perimeter += 1;
 
-    printf("perimeter %d\n", perimeter);
     img->perimeter = perimeter;
 }
 void setC1(Img *img){
@@ -293,7 +271,6 @@ void setC2(Img *img) {
         for (int j = *(img -> boundBox + 1); j < *(img -> boundBox + 9); j++) {
             if (getVal(img, j, i, 1) != 0) {
                 if (isPerimeter(img, i, j) != 0){
-                    k++;
                     varSum +=pow( sqrt(
                             pow(((double) (img->centroidr - n)), 2)
                             + pow((double) (img -> centroidc - m), 2)) - meanSum, 2);
@@ -301,7 +278,9 @@ void setC2(Img *img) {
             }
         }
     }
-    img -> C2 = varSum;
+    varSum /= (double) k;
+
+    img -> C2 = meanSum / sqrt(varSum);
 }
 
 void setSOMoment(Img *img){
@@ -311,9 +290,9 @@ void setSOMoment(Img *img){
     for (int i = *(img -> boundBox + 14); i < *(img -> boundBox + 4); i++) {
         for (int j = *(img -> boundBox + 1); j < *(img -> boundBox + 9); j++){
             if (getVal(img, j, i, 1) != 0){
-                img -> SOMonentc += pow(i - img -> centroidc , 2);
-                img -> SOMonentm += (j - img -> centroidr) * (i - img -> centroidc);
-                img -> SOMonentr += pow(j - img -> centroidr, 2);
+                img -> SOMonentc += (double) pow(i - img -> centroidc , 2);
+                img -> SOMonentm += (double) (j - img -> centroidr) * (i - img -> centroidc);
+                img -> SOMonentr += (double) pow(j - img -> centroidr, 2);
             }
         }
     }
@@ -331,8 +310,5 @@ Img * setAllComponent(Img *img, unsigned char comp){
     setC1(component);
     setC2(component);
     setSOMoment(component);
-    FILE *fp = fopen("output/out3.pgm", "w");
-    ImgToPgm(fp, component);
-    fclose(fp);
     return component;
 }
