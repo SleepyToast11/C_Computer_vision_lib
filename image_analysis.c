@@ -122,6 +122,8 @@ void thresholdImage(Img *img1, int limit){
     }
 }
 
+
+
 void perPixelTransformation(Img *img1, unsigned char *fun){
     int size = (img1 -> width) * (img1 -> height);
     for(int i = 0; i < size; i++){

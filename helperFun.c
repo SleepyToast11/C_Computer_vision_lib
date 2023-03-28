@@ -1,8 +1,3 @@
-//
-// Created by jerome on 2/1/23.
-//
-//
-
 #include <stdlib.h>
 #include <bits/types/FILE.h>
 #include <stdio.h>
