@@ -5,5 +5,5 @@ set(CMAKE_C_STANDARD 17)
 #add_compile_options(-O3)
 add_compile_options(-lm)
 
-add_executable(funtimes helperFun.c helperFun.h main.c component_labeling.c  image_analysis.c component_analysis.c component_helper.c)
+add_executable(funtimes helperFun.c helperFun.h main.c component_labeling.c  image_analysis.c component_analysis.c component_helper.c filters.c edgeDetector.c)
 target_link_libraries(funtimes m)

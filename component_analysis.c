@@ -1,21 +1,19 @@
 //
 // Created by jerome on 2/15/23.
 //
-
-#include <malloc.h>
 #include <stdlib.h>
 #include "helperFun.h"
 #include <math.h>
 
-int D0[2] = {-1,-1};
-int D1[2] = {0, -1};
-int D2[2] = {1,  -1};
-int D3[2] = {1,  0};
-int D4[2] = {1, 1};
-int D5[2] = {0, 1};
-int D6[2] = {-1,1};
-int D7[2] = {-1, 0};
-int *DIRECTION[8] = {D0, D1, D2, D3, D4, D5, D6, D7};
+int D0[] = {-1,-1};
+int D1[] = {0, -1};
+int D2[] = {1,  -1};
+int D3[] = {1,  0};
+int D4[] = {1, 1};
+int D5[] = {0, 1};
+int D6[] = {-1,1};
+int D7[] = {-1, 0};
+int *DIRECTION[] = {D0, D1, D2, D3, D4, D5, D6, D7};
 
 //O(n) do not use twice and remember to free
 Img * getComp(Img *img, unsigned char compNum){
