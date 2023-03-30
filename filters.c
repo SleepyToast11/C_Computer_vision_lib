@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "helperFun.h"
 #include <math.h>
 
@@ -30,13 +29,15 @@ void linearConvolution(Img *img, int size){
         for(int j = 0; j < img -> width; j++){
             sum = 0;
 
-            for (int k = -size; k < size; ++k) {
-                for (int l = -size; l < size; ++l) {
+            for (int k = -size; k <= size; ++k) {
+                for (int l = -size; l <= size; ++l) {
                     sum += getVal(data, j, i, 0);
                 }
             }
+
             sum /= 9;
             putVal(img, j, i, (unsigned char)sum);
+
         }
     }
     destroyImg(data);
@@ -61,16 +62,16 @@ void gaussianConvolution(Img *img, int size, double c, double sigma){
 
             sum = 0;
 
-            for (int k = -size; k < size; ++k) {
-                for (int l = -size; l < size; ++l) {
+            for (int k = -size; k <= size; ++k) {
+                for (int l = -size; l <= size; ++l) {
 
-                    temp = (double) getVal(data, j, i, 0);
+                    temp = (double) getVal(data, j, i, 0) / 255;
 
                     sum += temp * arr[k + size + 1][l + size + 1];
                 }
             }
             sum /= fraction;
-            putVal(img, j, i, (unsigned char)sum);
+            putVal(img, j, i, (unsigned char)(sum * 255));
         }
     }
     destroyImg(data);
