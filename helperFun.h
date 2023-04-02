@@ -71,7 +71,7 @@ Img * getComp(Img *img, unsigned char compNum);
 Img * setAllComponent(Img *img, unsigned char comp);
 
 //edgeDetector.c
-void horizontalEdge(Img* img, int derivation, int direction, int reversed);
+void horizontalEdge(Img* img, int derivation, int direction, int reversed, int centered);
 void verticalEdge(Img* img, int derivation);
 void gradientEdge(Img *img, double sigma, double c);
 
@@ -81,4 +81,4 @@ void linearFilter(Img* img, void* pixelTransformation(Img *img, unsigned char *f
 void powerLawTransform(unsigned char *arr, double c, double velar);
 void histogramStretching(unsigned char *arr, double a, double b);
 void linearConvolution(Img *img, int size);
-void gaussianConvolution(Img *img, int size, double c, double sigma);
+void gaussianConvolution(Img *img, int size, double *var);

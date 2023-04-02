@@ -2,7 +2,7 @@
 #include "stdlib.h"
 #include <math.h>
 
-void linearFilter(Img* img, void* pixelTransformation(Img *img, unsigned char *fun),
+void histogramManipulation(Img* img, void* pixelTransformation(Img *img, unsigned char *fun),
                   void* transformation(unsigned char *arr, double a, double b), double a, double b){
     unsigned char arr[256] = {0};
     transformation(arr, a, b);
@@ -19,24 +19,95 @@ int cmpfunc (const void * a, const void * b) {
     return ( *(unsigned char*)a - *(unsigned char*)b );
 }
 
-void medianFilter(Img *img){
-    double sum;
-    Img *data = copyImg(img);
-    char arr[9];
-
-
-    for(int i = 0; i < img -> height; i++) {
-        for (int j = 0; j < img->width; j++) {
-            for (int k = -1; k <= 1; ++k) {
-                for (int l = -1; l <= 1; ++l) {
-                    arr[(l + 1) + 3 * (k + 1)] = getVal(data, j + l, i + k, 0);
+int medianFilter(Img* img, int i, int j, int size){
+    unsigned char arr[size][size];
+    int temp = size;
+    size /= 2;
+            for (int k = -size; k <= size; ++k) {
+                for (int l = -size; l <= size; ++l) {
+                    arr[k+size][l+size] = getVal(img, j + l, i + k, 0);
                 }
             }
 
-            qsort(arr, 9, sizeof (char), cmpfunc);//Yes, this is comes standard in stdlib.c :)
-            putVal(img, j, i, *(arr + 5));
+            qsort(arr, 9, sizeof (char), cmpfunc); //Yes, this is comes standard in stdlib.c :)
+    return arr[size][size];
+}
+
+struct filter{
+    double* filter;
+    int size;
+    int halfSize;
+    double divider;
+};
+
+struct filter filter(struct filter *ptr, double* filter, int size){
+
+    double divider = 0;
+    malloc(size * size * sizeof (double));
+
+    for (int i = 0; i < size * size; ++i) {
+
+        ptr -> filter[i] = filter[i];
+
+        divider += filter[i];
+
+    }
+    ptr -> size = size;
+    ptr -> halfSize = size/2;
+    ptr -> divider = divider;
+}
+
+void destroyfilter(struct filter *ptr){
+    free(ptr->filter);
+}
+
+int applyToPixel(Img *img, int i, int j, struct filter filter){ //one could simplify by calculating divider for each, but across 1000th of iteration, its problematic
+    double sum;
+
+    sum = 0;
+
+    //improved accuracy could be achieved here by adding logic and making the default return -1 and removing the value at that index and the divider
+    for (int k = -filter.halfSize; k <= filter.halfSize; k++) {
+
+        for (int l = -filter.halfSize; l <= filter.halfSize; l++) {
+
+            sum += filter.filter[(k+filter.halfSize) * filter.size + (l + filter.halfSize)] *
+                    getVal(img, j + l, i + k, 0);
         }
     }
+    sum /= filter.divider;
+    return (int) sum;
+}
+
+void averagingFilter(struct filter* filter1, int size){
+
+    double arr[size * size];
+    for (int i = 0; i < size*size; ++i) {
+        arr[i] = 1;
+    }
+
+    filter(filter1, arr, size);
+}
+
+void smoothingFilter(Img *img, int size, void (function)(), double *var){
+    
+    struct filter fil;
+
+    if(!var)
+        function(&fil, size);
+    else
+        function(&fil, size, var);
+
+    Img *data = copyImg(img);
+
+    for(int i = 0; i < img -> height; i++){
+        for(int j = 0; j < img -> width; j++) {
+
+            putVal(img, j, i, applyToPixel(data, i, j, fil));
+
+        }
+    }
+
     destroyImg(data);
 }
 
@@ -45,28 +116,6 @@ inline void histogramStretching(unsigned char *arr, double a, double b){
         arr[i] = (unsigned char) ((a*i + b));
 }
 
-void linearConvolution(Img *img, int size){
-    double sum;
-    size /= 2;
-    Img *data = copyImg(img);
-
-    for(int i = 0; i < img -> height; i++){
-        for(int j = 0; j < img -> width; j++){
-            sum = 0;
-
-            for (int k = -size; k <= size; k++) {
-                for (int l = -size; l <= size; l++) {
-                    sum += getVal(data, j + l, i + k, 0);
-                }
-            }
-
-            sum /= 9;
-            putVal(img, j, i, (unsigned char)sum);
-
-        }
-    }
-    destroyImg(data);
-}
 
 void gaussianConvolution(Img *img, int size, double c, double sigma){
     double sum, temp, fraction;
