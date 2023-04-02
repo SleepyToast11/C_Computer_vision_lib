@@ -12,7 +12,20 @@
     };
  */
 
-int main() {
+Img* getImg(){
+    printf("enter full name of file: ");
+    char arg[20];
+    memset(arg, 0, 20);
+    if(0 == scanf("%s", arg))
+        exit(-1);
+    FILE *fp;
+    fp = fopen(arg, "r");
+    Img *data = pgmToImg(fp);
+    fclose(fp);
+    return data;
+}
+
+int assign1(){
     printf("Hello! This is a simple program without gui to analyse an pgm image and get\n"
            "various data of all the components. The program works linearly in steps and \n"
            "no arguments are used if passed as to try to keep it simple. Here is in order the steps:\n\n"
@@ -29,16 +42,11 @@ int main() {
            "\tas well as a txt. Also, for each component present, the program will output, in its own folder in output called \n"
            "\tcomp(NUMBEROFCOMPONENT), a stand alone image of the component in a pgm format with the same pixel "
            "\t labeling scheme as required, with all its data point in a .txt file\n\n\n");
-    printf("enter full name of file: ");
-    char arg[20];
-    memset(arg, 0, 20);
-    if(0 == scanf("%s", arg))
-        exit(-1);
-    FILE *fp, *fp1;
-    fp = fopen(arg, "r");
-    Img *data = pgmToImg(fp);
+
+    Img *data = getImg();
     Img *original = copyImg(data);
-    fclose(fp);
+
+    FILE *fp;
 
     printf("Threshold helper\npixel val, num of pixels, percentage of pixels\n");
     thresholdHelper(data);
@@ -49,47 +57,124 @@ int main() {
         exit(-1);
 
     thresholdImage(data, limit);
-    fp1 = fopen("output/threshold.pgm", "w");
-    outImg(fp1, data);
-    fclose(fp1);
+    fp = fopen("output/threshold.pgm", "w");
+    outImg(fp, data);
+    fclose(fp);
 
-    fp1 = fopen("output/inverted.pgm", "w");
+    fp = fopen("output/inverted.pgm", "w");
 
 
     invertImage(data);
 
-
-
     printf("number of object (corner algorithm): %d\n\n", numberOfObj(data));
-while(1){
-    char filter;
-    int filterInt;
-    printf("\nDo you want to dilate(d), erode(e) or do nothing (q):");
-    scanf("%c", &filter);
-    char temp = filter;
-    if(filter == '\n')
-        continue;
-    if(temp == 'd' || temp == 'e'){
-        printf("\nby how much (diameter of filter): \n");
-        scanf("%d", &filterInt);
-        if(temp == 'd')
-            dilate(data, filterInt);
-        if(temp == 'e')
-            errode(data, filterInt);
+    while(1){
+        char filter;
+        int filterInt;
+        printf("\nDo you want to dilate(d), erode(e) or do nothing (q):");
+        scanf("%c", &filter);
+        char temp = filter;
+        if(filter == '\n')
+            continue;
+        if(temp == 'd' || temp == 'e'){
+            printf("\nby how much (diameter of filter): \n");
+            scanf("%d", &filterInt);
+            if(temp == 'd')
+                dilate(data, filterInt);
+            if(temp == 'e')
+                errode(data, filterInt);
+        }
+        else
+            break;
     }
-    else
-        break;
-}
 
-    outImg(fp1, data);
+    outImg(fp, data);
 
     printf("\nnumber of components: %d\n", label(data)); //labels image here, could be a call itself though
 
 
-    fclose(fp1);
+    fclose(fp);
 
     compsToPGN(data, original); //makes all the components separate files
     destroyImg(data);
     destroyImg(original);
     return 0;
+}
+
+int assign2(){
+    Img *data = getImg();
+
+    char *path = malloc(sizeof (char) * 50);
+
+    Img *linear;
+
+    FILE *fp;
+
+
+
+    sprintf(path, "output/PowerLaw5-0.14.pgm");
+    fp = fopen(path, "w");
+
+    linearFilter(data, (void *)perPixelTransformation, (void *)powerLawTransform, (double)5, (double)1.4);
+
+    ImgToPgm(fp, data);
+    fclose(fp);
+
+
+    sprintf(path, "output/gaussianConvolution.pgm");
+    fp = fopen(path, "w");
+
+    gaussianConvolution(data, 3, 0.1, 0.9);
+
+    ImgToPgm(fp, data);
+    fclose(fp);
+
+
+
+
+        for (int j = 1; j < 10; ++j) {
+            for (int k = 1; k < 10; ++k) {
+                for (int l = 1; l < 10; ++l) {
+
+                    linear = copyImg(data);
+
+                    sprintf(path, "output/edge1-%d-%d-%d.pgm", j,k,l);
+                    fp = fopen(path, "w");
+
+                    gradientEdge(linear, (double) 675 / 1000, j);
+
+                    linearFilter(linear, (void *)perPixelTransformation, (void *)powerLawTransform, (double)k, (double)l/10);
+
+                    ImgToPgm(fp, linear);
+                    fclose(fp);
+
+                    destroyImg(linear);
+
+            }
+            }
+        }
+
+    free(path);
+    destroyImg(data);
+    return 0;
+}
+
+int main() {
+
+    printf("Hello, which assignment would you want?");
+    int option;
+    scanf("%d", &option);
+
+
+
+    switch (option) {
+        case 1:
+            return assign1();
+
+        case 2:
+            return assign2();
+
+        default:
+            printf("only 1 or 2 is possible for now");
+            return -1;
+    }
 }

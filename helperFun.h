@@ -38,7 +38,7 @@ void outImg(FILE *file, Img *img);
 void destroyImg(Img *img);
 void thresholdHelper(Img* img1);
 unsigned char getVal(Img *img, int x, int y, unsigned char defaultVal);
-void putVal(Img *img, int x, int y, unsigned char val);
+void putVal(Img *img, int x, int y, int val);
 int checkMask(Img *img, int x, int y, int *arr, int xsize, int ysize);
 unsigned char checkMaskGeneric(Img *img, int x, int y, int size);
 void errode(Img *img, int size);
@@ -69,3 +69,16 @@ void compsToPGN(Img *img, Img *original);
 
 Img * getComp(Img *img, unsigned char compNum);
 Img * setAllComponent(Img *img, unsigned char comp);
+
+//edgeDetector.c
+void horizontalEdge(Img* img, int derivation, int direction, int reversed);
+void verticalEdge(Img* img, int derivation);
+void gradientEdge(Img *img, double sigma, double c);
+
+//filters.c
+void linearFilter(Img* img, void* pixelTransformation(Img *img, unsigned char *fun),
+                  void* transformation(unsigned char *arr, double a, double b), double a, double b);
+void powerLawTransform(unsigned char *arr, double c, double velar);
+void histogramStretching(unsigned char *arr, double a, double b);
+void linearConvolution(Img *img, int size);
+void gaussianConvolution(Img *img, int size, double c, double sigma);

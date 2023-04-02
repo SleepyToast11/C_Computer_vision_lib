@@ -1,4 +1,3 @@
-#include <memory.h>
 #include <stdio.h>
 #include "helperFun.h"
 
@@ -21,7 +20,14 @@ void thresholdHelper(Img* img1){
 
 }
 
-void putVal(Img *img, int x, int y, unsigned char val){
+void putVal(Img *img, int x, int y, int val){
+
+    if(val > 255)
+        val = 255;
+    if(val < 0)
+        val = 0;
+
+    val = (unsigned char) val;
     if(x < 0 || y < 0 || x >= img -> width || y >= img->height)
         return;
     *(img->data + (y* img->width + x)) = val;

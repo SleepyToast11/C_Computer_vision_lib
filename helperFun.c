@@ -9,7 +9,6 @@ void destroyImg(Img *img){
     free(img -> header);
     if(img -> boundboxPresent)
         free(img -> boundBox);
-    free(img);
 }
 
 Img * copyImg(Img *img){
