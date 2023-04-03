@@ -208,7 +208,7 @@ int assign2(){
             printf("\ncentered (yes: 1, no: 0): ");
             scanf("%d", &filterint4);
 
-            edgeDetector()
+            edgeDetector(1)
         }
     }
 
