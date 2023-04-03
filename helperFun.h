@@ -5,7 +5,10 @@
 #ifndef FUNTIMES_HELPERFUN_H
 
 #define FUNTIMES_HELPERFUN_H
-
+#define DIRECTION_BOTH 3
+#define DIRECTION_VERTICAL 2
+#define DIRECTION_HORIZONTAL 1
+#define MAX(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 #include <bits/types/FILE.h>
 
@@ -31,6 +34,12 @@ typedef struct {
     } Img;
 
 
+struct filter{
+    double* filter;
+    int size;
+    int halfSize;
+    double divider;
+};
 
 #endif //FUNTIMES_HELPERFUN_H
 void ImgToPgm(FILE *file, Img *img1);
@@ -71,14 +80,18 @@ Img * getComp(Img *img, unsigned char compNum);
 Img * setAllComponent(Img *img, unsigned char comp);
 
 //edgeDetector.c
-void horizontalEdge(Img* img, int derivation, int direction, int reversed, int centered);
-void verticalEdge(Img* img, int derivation);
-void gradientEdge(Img *img, double sigma, double c);
+void edgeDetector(Img* img, int direction, int reversed, int centered, int sobel);
+void gaussianGradientEdge(Img *img, double sigma, int reversed, int direction);
 
 //filters.c
-void linearFilter(Img* img, void* pixelTransformation(Img *img, unsigned char *fun),
+void histogramManipulation(Img* img, void* pixelTransformation(Img *img, unsigned char *fun),
                   void* transformation(unsigned char *arr, double a, double b), double a, double b);
 void powerLawTransform(unsigned char *arr, double c, double velar);
+void smoothingFilter(Img *img, int size, int function(), void (fil)(struct filter* filter1, int size, double a, double b),
+                     double a, double b);
+int medianFilter(Img* img, int i, int j, int size);
+int applyLinearFilterToPixel(Img *img, int i, int j, struct filter filter);
+void averagingFilter(struct filter* filter1, int size, double a, double b);
 void histogramStretching(unsigned char *arr, double a, double b);
 void linearConvolution(Img *img, int size);
-void gaussianConvolution(Img *img, int size, double *var);
+void gaussianConvolution(struct filter* fil, int size, double c, double sigma);

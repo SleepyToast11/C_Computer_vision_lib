@@ -183,6 +183,7 @@ void setBoundBox(Img *img) {
         }
     }
     end:
+        ;
 }
 
 int isPerimeter(Img *img, int i, int j){
