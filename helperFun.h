@@ -8,13 +8,10 @@
 #define DIRECTION_BOTH 3
 #define DIRECTION_VERTICAL 2
 #define DIRECTION_HORIZONTAL 1
-#define MAX(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 #include <bits/types/FILE.h>
 
 typedef struct {
-
-        unsigned char *data;
         int height;
         int width;
         char *header;
@@ -31,7 +28,15 @@ typedef struct {
         double perimeter;
         double C1;
         double C2;
+        unsigned char *data;
     } Img;
+
+
+typedef struct{
+    Img *rImg;
+    Img *gImg;
+    Img *bImg;
+} rgbImg;
 
 
 struct filter{
@@ -86,12 +91,14 @@ void gaussianGradientEdge(Img *img, double sigma, int reversed, int direction);
 //filters.c
 void histogramManipulation(Img* img, void* pixelTransformation(Img *img, unsigned char *fun),
                   void* transformation(unsigned char *arr, double a, double b), double a, double b);
+void linearTransform(unsigned char *arr, double a, double b);
 void powerLawTransform(unsigned char *arr, double c, double velar);
-void smoothingFilter(Img *img, int size, int function(), void (fil)(struct filter* filter1, int size, double a, double b),
+void smoothingFilter(Img *img, int size, int function(Img* img, int i, int j, struct filter fil, int size), void (fil)(struct filter* filter1, int size, double a, double b),
                      double a, double b);
-int medianFilter(Img* img, int i, int j, int size);
-int applyLinearFilterToPixel(Img *img, int i, int j, struct filter filter);
+int medianFilter(Img* img, int i, int j, struct filter fil, int size);
 void averagingFilter(struct filter* filter1, int size, double a, double b);
 void histogramStretching(unsigned char *arr, double a, double b);
-void linearConvolution(Img *img, int size);
+int applyLinearFilterToPixel(Img *img, int i, int j, struct filter filter, int a);
 void gaussianConvolution(struct filter* fil, int size, double c, double sigma);
+
+void ppmToArray(FILE **file, rgbImg* img);

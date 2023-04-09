@@ -4,26 +4,26 @@
 #define DIRECTION_BOTH 3
 #define DIRECTION_VERTICAL 2
 #define DIRECTION_HORIZONTAL 1
-#define MAX(X, Y) (((X) < (Y)) ? (X) : (Y))
+#define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
-//0 both, 1 horizontal, 2 vertical
 void edgeDetector(Img* img, int direction, int reversed, int centered, int sobel){
 
     Img *data = copyImg(img);
 
     int so = 0;
 
-    if (!sobel)
+    if (sobel) {
         so = 1;
-    else {
-        sobel = 1;
         centered = 1;
     }
-
-    int rev = -1;
+    else {
+        sobel = 1;
+    }
 
     if(!reversed)
-        rev = 1;
+        reversed = 1;
+    else
+        reversed = -1;
 
     int sobelArr[] = {reversed, reversed * sobel, reversed};
 
@@ -37,12 +37,13 @@ void edgeDetector(Img* img, int direction, int reversed, int centered, int sobel
     int sumx, sumy, l;
 
         for(int i = 0; i < img -> height; i++){
+            l = l;
             for(int j = 0; j < img -> width; j++){
 
                 sumx = 0;
                 sumy = 0;
 
-                for(int k = -centered; k <= 1; k++) {
+                for(int k = -centered; k <= 1; ++k) {
 
                     if(!centeredArr[centered + 1])
                         continue;
@@ -50,16 +51,16 @@ void edgeDetector(Img* img, int direction, int reversed, int centered, int sobel
                     l = -so; //will only be 0 or 1
 
                     do{
-                        l++;
                         if (direction & 1)
-                            sumx += centeredArr[centered + 1] * sobelArr[l + 1] *
-                                    getVal(data, j + centered, i + l, 0);
+                            sumx += centeredArr[k + 1] * sobelArr[l + 1] *
+                                    getVal(data, j + k, i + l, 0);
 
                         if (direction & 2)
-                            sumy += centeredArr[centered + 1] * sobelArr[l + 1] *
-                                    getVal(data, j + l, i + centered, 0);
+                            sumy += centeredArr[k + 1] * sobelArr[l + 1] *
+                                    getVal(data, j + l, i + k, 0);
 
-                        } while (l <= 1 && so != 0);
+                        l++;
+                    } while (l <= 1 && so != 0);
                     }
                 putVal(img, j, i, MAX(sumy, sumx));
                 }
@@ -79,17 +80,17 @@ void gaussianGradientEdge(Img *img, double sigma, int reversed, int direction){
     double sumx, sumy, temp, fraction;
     double arrx[3][3];
     double arry[3][3];
-
+    int tempInt;
 
     Img *data = copyImg(img);
 
     for (int k = -1; k <= 1; ++k) {
         for (int l = -1; l <= 1; ++l) {
 
-            arrx[k + 1][l + 1] = reversed * (double) l / -2 / M_PI / pow(sigma, 4) *
+            arrx[k + 1][l + 1] = (double) reversed * (double) l / -2 / M_PI / pow(sigma, 4) *
                     exp((-1 * (pow(k, 2) + pow(l, 2))) / pow(sigma, 2) / 2);
 
-            arry[k + 1][l + 1] = reversed * (double) k / -2 / M_PI / pow(sigma, 4) *
+            arry[k + 1][l + 1] = (double) reversed * (double) k / -2 / M_PI / pow(sigma, 4) *
                     exp((-1 * (pow(k, 2) + pow(l, 2))) / pow(sigma, 2) / 2);
 
         }
@@ -104,7 +105,7 @@ void gaussianGradientEdge(Img *img, double sigma, int reversed, int direction){
             for (int k = -1; k <= 1; ++k) {
                 for (int l = -1; l <= 1; ++l) {
 
-                    temp = (double) getVal(data, j, i, 0) / 255;
+                    temp = (double) getVal(data, j + l, i+ k, 0);
 
                     if(direction & 1)
                         sumx += temp * arrx[k + 1][l + 1];
@@ -117,7 +118,7 @@ void gaussianGradientEdge(Img *img, double sigma, int reversed, int direction){
             sumx = pow(sumx, 2);
             sumy = pow(sumy, 2);
 
-            putVal(img, j, i, (sqrt(sumx + sumy) * 255));
+            putVal(img, j, i, (sqrt(sumx + sumy)));
         }
     }
 

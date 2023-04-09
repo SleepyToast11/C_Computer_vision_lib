@@ -112,148 +112,126 @@ int assign2(){
     int filterint1, filterint2, filterint3, filterint4;
     int size;
 
-    while(1){
-            printf("\nDo you want to do histogram manipulation (h), smoothing(s) or next step (q):");
+    while (1) {
+        printf("\nDo you want to do preprocessing (p), edge detection(e), threshold (t) or quit (q): ");
+        scanf("%1s", &filter);
+
+        if (filter == 'p') {
+            printf("\nDo you want to do histogram manipulation (h) or smoothing(s):");
             scanf("%1s", &filter);
 
-        if(filter == 'h') {
+            if (filter == 'h') {
 
-            printf("\nlinear (l) or power law (p): ");
-            scanf("%1s", &filter);
-
-            if (filter == 'p')
-                printf("\n\nValues example:c sigma:");
-
-            else
-                printf("\n\nValues example:a b:");
-
-            scanf("%lf %lf", &filterDouble1, &filterDouble2);
-
-            if (filter == 'p')
-                histogramManipulation(data, (void *) perPixelTransformation,
-                                      (void *) powerLawTransform, filterDouble1, filterDouble2);
-
-            else
-                histogramManipulation(data, (void *) perPixelTransformation,
-                                      (void *) powerLawTransform, filterDouble1, filterDouble2);
-        }
-        else if(filter == 's'){
-            printf("\nlinear (l) or median (m): ");
-            scanf("%1s", &filter);
-
-            printf("\nwhat size: ");
-            scanf("%lf", &filterint1);
-
-            if(filter == 'l'){
-                printf("\naveraging(a) or gaussian(g): ");
+                printf("\nlinear (l) or power law (p): ");
                 scanf("%1s", &filter);
 
-                if(filter == 'g') {
-                    printf("\nwhat sigma value: ");
-                    scanf("%lf", &filterDouble2);
+                if (filter == 'p')
+                    printf("\n\nValues example:c sigma:");
 
-                    smoothingFilter(data, (int) filterint1, applyLinearFilterToPixel,
-                                    gaussianConvolution, 1, filterDouble2);
-                }
-                else{
-                    smoothingFilter(data, (int) filterint1, applyLinearFilterToPixel,
-                                    averagingFilter, 0, 0);
+                else
+                    printf("\n\nValues example:a b:");
+
+                scanf("%lf %lf", &filterDouble1, &filterDouble2);
+
+                if (filter == 'p')
+                    histogramManipulation(data, (void *) perPixelTransformation,
+                                          (void *) powerLawTransform, filterDouble1, filterDouble2);
+
+                else
+                    histogramManipulation(data, (void *) perPixelTransformation,
+                                          (void *) linearTransform, filterDouble1, filterDouble2);
+            } else if (filter == 's') {
+                printf("\nlinear (l) or median (m): ");
+                scanf("%1s", &filter);
+
+                printf("\nwhat size: ");
+                scanf("%d", &filterint1);
+
+                if (filter == 'l') {
+                    printf("\naveraging(a) or gaussian(g): ");
+                    scanf("%1s", &filter);
+
+                    if (filter == 'g') {
+                        printf("\nwhat sigma value: ");
+                        scanf("%lf", &filterDouble2);
+
+                        smoothingFilter(data, (int) filterint1, applyLinearFilterToPixel,
+                                        gaussianConvolution, 1, filterDouble2);
+                    } else {
+                        smoothingFilter(data, (int) filterint1, applyLinearFilterToPixel,
+                                        averagingFilter, 0, 0);
+                    }
+                } else {
+                    smoothingFilter(data, (int) filterint1, medianFilter,
+                                    0, 0, 0);
                 }
             }
-            else{
-                smoothingFilter(data, (int) filterint1, medianFilter,
-                                0, 0, 0);
+            printf("\n\nYou can now go see the image in output/preprocessed.pgm\n\n");
+            fp = fopen("output/preprocessed.pgm", "w");
+
+            ImgToPgm(fp, data);
+
+            fclose(fp);
+
+            continue;
+        }
+
+
+        if (filter == 'e') {
+            printf("\nwhat type of edge detection gaussian (g) or other (o): ");
+            scanf("%1s", &filter);
+
+            if (!(filter == 'g' || filter == 'o'))
+                break;
+
+            printf("\nwhat direction(1: horizontal, 2: vertical, 3 both): ");
+            scanf("%d", &filterint1);
+
+            printf("\nreversed (0: no, 1: yes): ");
+            scanf("%d", &filterint2);
+
+            if (filter == 'g') {
+                printf("\nwhat sigma value: ");
+                scanf("%lf", &filterDouble1);
+
+
+                gaussianGradientEdge(data, filterDouble1, filterint2, filterint1);
+            } else if (filter == 'o') {
+                printf("\nSobel operator (any num > 0) Prewitt (1) or not (0): ");
+                scanf("%d", &filterint3);
+
+                printf("\ncentered (yes: 1, no: 0): ");
+                scanf("%d", &filterint4);
+
+                edgeDetector(data, filterint1, filterint2, filterint4, filterint3);
             }
+            printf("\n\nYou can now go see the image in output/postprocess.pgm\n\n");
+            fp = fopen("output/postprocess.pgm", "w");
+
+            ImgToPgm(fp, data);
+
+            fclose(fp);
+
+            continue;
+        }
+
+        if (filter == 't') {
+            thresholdHelper(data);
+
+            printf("\nWhat value to threshold at: ");
+            scanf("%d", &filterint1);
+            thresholdImage(data, filterint1);
+
+            fp = fopen("output/threshold.pgm", "w");
+
+            outImg(fp, data);
+
+            fclose(fp);
         }
         else
             break;
-
-        printf("\n\nYou can now go see the image in output/preprocessed.pgm\n\n");
-        fp = fopen("output/preprocessed.pgm", "w");
-
-        ImgToPgm(fp, data);
-
-        fclose(fp);
     }
 
-    printf("\n\nYou can now go see the image in output/preprocessed.pgm\n\n");
-    fp = fopen("output/preprocessed.pgm", "w");
-
-    ImgToPgm(fp, data);
-
-    fclose(fp);
-
-
-    while(1){
-        printf("\nwhat type of edge detection gaussian (g), other (o) or quit (q): ");
-        scanf("%1s", &filter);
-
-        printf("\nwhat direction(1: horizontal, 2: vertical, 3 both): ");
-        scanf("%d", &filterint1);
-
-        printf("\nreversed (0: no, 1: yes): ");
-        scanf("%d", &filterint2);
-
-        if(filter == 'g') {
-            printf("\nwhat sigma value: ");
-            scanf("%lf", &filterDouble1);
-
-
-            gaussianGradientEdge(data, filterDouble1, filterint2, filterint1);
-        }
-        else{
-            printf("\nSobel operator (any num > 0) Prewitt (1) or not (0): ");
-            scanf("%d", &filterint3);
-
-            printf("\ncentered (yes: 1, no: 0): ");
-            scanf("%d", &filterint4);
-
-            edgeDetector(1)
-        }
-    }
-
-
-    sprintf(path, "output/PowerLaw5-0.14.pgm");
-    fp = fopen(path, "w");
-
-    histogramManipulation(data, (void *)perPixelTransformation, (void *)powerLawTransform, (double)5, (double)1.4);
-
-    ImgToPgm(fp, data);
-    fclose(fp);
-
-
-    sprintf(path, "output/gaussianConvolution.pgm");
-    fp = fopen(path, "w");
-
-    //gaussianConvolution(data, 3, 0.1, 0.9);
-
-    ImgToPgm(fp, data);
-    fclose(fp);
-
-
-
-/*
-        for (int j = 1; j < 10; ++j) {
-            for (int k = 1; k < 10; ++k) {
-                for (int l = 1; l < 10; ++l) {
-
-                    linear = copyImg(data);
-
-                    sprintf(path, "output/edge1-%d-%d-%d.pgm", j,k,l);
-                    fp = fopen(path, "w");
-
-                    gaussianGradientEdge(linear, (double) 675 / 1000, j);
-                    histogramManipulation(linear, (void *)perPixelTransformation, (void *)powerLawTransform, (double)k, (double)l/10);
-
-                    ImgToPgm(fp, linear);
-                    fclose(fp);
-
-                    destroyImg(linear);
-
-                }
-            }
-        }
-*/
     free(path);
     destroyImg(data);
     return 0;

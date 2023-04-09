@@ -24,7 +24,7 @@ int cmpfunc (const void * a, const void * b) {
     return ( *(unsigned char*)a - *(unsigned char*)b );
 }
 
-int medianFilter(Img* img, int i, int j, int size){
+int medianFilter(Img* img, int i, int j, struct filter fil, int size){
     unsigned char arr[size][size];
     int temp = size;
     size /= 2;
@@ -68,7 +68,7 @@ void destroyfilter(struct filter *ptr){
 }
 
 
-int applyLinearFilterToPixel(Img *img, int i, int j, struct filter filter){ //one could simplify by calculating divider for each, but across 1000th of iteration, its problematic
+int applyLinearFilterToPixel(Img *img, int i, int j, struct filter filter, int a){ //one could simplify by calculating divider for each, but across 1000th of iteration, its problematic
     double sum;
 
     sum = 0;
@@ -97,7 +97,7 @@ void averagingFilter(struct filter* filter1, int size, double a, double b){
     *filter1 = filter(arr, size);
 }
 
-void smoothingFilter(Img *img, int size, int function(), void (fil)(struct filter* filter1, int size, double a, double b),
+void smoothingFilter(Img *img, int size, int function(Img* img, int i, int j, struct filter fil, int size), void (fil)(struct filter* filter1, int size, double a, double b),
                      double a, double b){
     if(fil){
         struct filter myFilter;
@@ -108,7 +108,7 @@ void smoothingFilter(Img *img, int size, int function(), void (fil)(struct filte
         for(int i = 0; i < img -> height; i++){
             for(int j = 0; j < img -> width; j++) {
 
-                putVal(img, j, i, function(data, i, j, myFilter));
+                putVal(img, j, i, function(data, i, j, myFilter, 0));
 
             }
         }
@@ -116,12 +116,13 @@ void smoothingFilter(Img *img, int size, int function(), void (fil)(struct filte
         destroyImg(data);
     }
     else{
+        struct filter myFilter;
         Img *data = copyImg(img);
 
         for(int i = 0; i < img -> height; i++){
             for(int j = 0; j < img -> width; j++) {
 
-                putVal(img, j, i, function((data, i, j, size)));
+                putVal(img, j, i, (unsigned char)function(data, i, j, myFilter, size));
 
             }
         }
