@@ -36,7 +36,7 @@ void minComponentSize(Img* img, unsigned char *tree, unsigned char *ptr, int com
     perPixelTransformation(img, fun);
 }
 
-inline unsigned char getVal(Img *img, int x, int y, unsigned char defaultVal){
+unsigned char getVal(Img *img, int x, int y, unsigned char defaultVal){
     if(x < 0 || y < 0 || x >= img -> width || y >= img->height)
         return defaultVal;
     return *(img->data + (y* img->width + x));

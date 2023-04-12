@@ -38,6 +38,11 @@ typedef struct{
     Img *bImg;
 } rgbImg;
 
+struct ListPoint{
+    double **list;
+    unsigned char pointSize;
+    int size;
+};
 
 struct filter{
     double* filter;
@@ -47,14 +52,19 @@ struct filter{
 };
 
 #endif //FUNTIMES_HELPERFUN_H
+
+rgbImg* ppmToImg(FILE *img);
+void destroyRgbImg(rgbImg *img);
+void rgbImgToPpm(FILE *file, rgbImg *img);
+rgbImg * copyRgbImg(rgbImg *img);
 void ImgToPgm(FILE *file, Img *img1);
 void outImg(FILE *file, Img *img);
 void destroyImg(Img *img);
 void thresholdHelper(Img* img1);
-unsigned char getVal(Img *img, int x, int y, unsigned char defaultVal);
 void putVal(Img *img, int x, int y, int val);
 int checkMask(Img *img, int x, int y, int *arr, int xsize, int ysize);
 unsigned char checkMaskGeneric(Img *img, int x, int y, int size);
+unsigned char getVal(Img *img, int x, int y, unsigned char defaultVal);
 void errode(Img *img, int size);
 void dilate(Img *img, int size);
 int numberOfObj(Img *img);
@@ -101,4 +111,34 @@ void histogramStretching(unsigned char *arr, double a, double b);
 int applyLinearFilterToPixel(Img *img, int i, int j, struct filter filter, int a);
 void gaussianConvolution(struct filter* fil, int size, double c, double sigma);
 
-void ppmToArray(FILE **file, rgbImg* img);
+void ppmToArray(FILE *file, rgbImg* img);
+rgbImg* ppmtoRgbImg(FILE *pFile);
+
+//utility
+void addPoints(const double *src, double *dst, int size);
+void multiplyPoints(const double src, double *dst, int size);
+void dividePointCons(const double src, double *dst, int size);
+double distancePoints(double *a, double *b, int size, int withPos);
+double drand( double low, double high );
+void nullDPoint(double *dst, int size);
+void nullList(struct ListPoint *list);
+Img* getImg();
+rgbImg *getRgbImg();
+
+//kmean
+int minimumDistance(double *point, struct ListPoint list, int withPos);
+void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, int numberGen, double genDelta);
+struct ListPoint * genRandClusterImg(Img *img, int k, int size);
+void rgbIMGToListPoint(rgbImg *img, struct ListPoint *dst);
+void IMGToListPoint(Img *img, struct ListPoint *dst);
+void destroyListPoint(struct ListPoint listPoint);
+void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *cluster, int withPos);
+void listPointToImg(struct ListPoint *src, Img *dst, struct ListPoint *cluster, int withPos);
+
+void ListPoint(struct ListPoint *dst, int pointSize, int size);
+void Point(double *dst, const double* vals, int size, int x, int y);
+
+//assignments
+int assign1();
+int assign2();
+int assign3();

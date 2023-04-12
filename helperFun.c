@@ -194,9 +194,12 @@ Img* pgmToImg(FILE *img){
 
 
 //could be improved visually by separating repeating elements in separate functions, ain't feeling like it
-Img* ppmExtractor(FILE **pFile){
+rgbImg* ppmtoRgbImg(FILE *pFile){
     rgbImg *ret;
     ret = malloc(sizeof(rgbImg));
+    ret->rImg = malloc(sizeof (Img));
+    ret->gImg = malloc(sizeof (Img));
+    ret->bImg = malloc(sizeof (Img));
 
     ret -> bImg -> boundboxPresent = 0;
     ret -> gImg -> boundboxPresent = 0;
@@ -207,20 +210,20 @@ Img* ppmExtractor(FILE **pFile){
     header = malloc(100 * sizeof (char));
     int headCur = 0;
 
-    if( 0 == fread(buf, 1,1, *pFile))
+    if( 0 == fread(buf, 1,1, pFile))
         exit(-1);
 
     while(!(buf[0] == ' ' || buf[0] == '\0' || buf[0] == '\n')){
         header[headCur] = *buf;
         headCur++;
-        if( 0 == fread(buf, 1,1, *pFile))
+        if( 0 == fread(buf, 1,1, pFile))
             exit(-1);
     }
 
     while((buf[0] == ' ' || buf[0] == '\0' || buf[0] == '\n')){
         header[headCur] = *buf;
         headCur++;
-        if( 0 == fread(buf, 1,1, *pFile))
+        if( 0 == fread(buf, 1,1, pFile))
             exit(-1);
     }
 
@@ -235,7 +238,7 @@ Img* ppmExtractor(FILE **pFile){
             numbuf[numbufcur] = *buf;
             numbufcur++;
             headCur++;
-            if( 0 == fread(buf, 1,1, *pFile))
+            if( 0 == fread(buf, 1,1, pFile))
                 exit(-1);
         }
 
@@ -256,7 +259,7 @@ Img* ppmExtractor(FILE **pFile){
         while ((buf[0] == ' ' || buf[0] == '\0' || buf[0] == '\n')) {
             header[headCur] = *buf;
             headCur++;
-            if(0 == fread(buf, 1,1, *pFile))
+            if(0 == fread(buf, 1,1, pFile))
                 exit(-1);
         }
 
@@ -319,7 +322,7 @@ void rgbImgToPpm(FILE *file, rgbImg *img){
 rgbImg* ppmToImg(FILE *img){
     if(img == 0)
         exit(-1);
-    return ppmExtractor(&img);
+    return ppmtoRgbImg(img);
 }
 
 void destroyRgbImg(rgbImg *img){
@@ -329,16 +332,17 @@ void destroyRgbImg(rgbImg *img){
     free(img);
 }
 
-Img * copyRgbImg(rgbImg *img){
+rgbImg * copyRgbImg(rgbImg *img){
     rgbImg *ret = malloc(sizeof (rgbImg));
 
     ret -> bImg = copyImg(img -> bImg);
     ret -> gImg = copyImg(img -> gImg);
     ret -> rImg = copyImg(img -> rImg);
+    return ret;
 }
 
 //takes a ptr to an opened and  pgm file and returns a ptr to an array and
-void ppmToArray(FILE **file, rgbImg* img){
+void ppmToArray(FILE *file, rgbImg* img){
 
     int partNum = 0;
     Img *part[] = {img -> rImg, img -> gImg, img -> bImg};
@@ -350,7 +354,7 @@ void ppmToArray(FILE **file, rgbImg* img){
 
     char charBuf[BLOCK_SIZE];
 
-    int remaining = (int) fread(charBuf, 1, BLOCK_SIZE, *file);
+    int remaining = (int) fread(charBuf, 1, BLOCK_SIZE, file);
 
     char numBuf[10] = {0};
     int j = 0;
@@ -385,6 +389,6 @@ void ppmToArray(FILE **file, rgbImg* img){
             i++;
         }
         load:
-        remaining = (int) fread(charBuf, sizeof (char), 128, *file);
+        remaining = (int) fread(charBuf, sizeof (char), 128, file);
     }
 }
