@@ -124,11 +124,12 @@ void nullDPoint(double *dst, int size);
 void nullList(struct ListPoint *list);
 Img* getImg();
 rgbImg *getRgbImg();
+void copyPoint(const double *src, double *dst, int size);
 
 //kmean
 int minimumDistance(double *point, struct ListPoint list, int withPos);
 void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, int numberGen, double genDelta);
-struct ListPoint * genRandClusterImg(Img *img, int k, int size);
+void genRandClusterImg(Img *img, struct ListPoint *dst, int k, int pointSize);
 void rgbIMGToListPoint(rgbImg *img, struct ListPoint *dst);
 void IMGToListPoint(Img *img, struct ListPoint *dst);
 void destroyListPoint(struct ListPoint listPoint);

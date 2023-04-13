@@ -2,29 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
-void rgbIMGToListPoint(rgbImg *img, struct ListPoint *dst){
-
-    double *val = malloc(3 * sizeof (double));
-
-
-
-    for(int i = 0; i < (img -> rImg -> height); ++i){
-        for(int j = 0; j < (img -> rImg -> width); ++j){
-
-            val[0] = (double) *(((img ->rImg)->data) + (i*(img -> rImg -> width)+j));
-            val[1] = (double) *((img ->gImg)->data + (i*(img -> rImg -> width)+j));
-            val[2] = (double) *((img ->bImg)->data + (i*(img -> rImg -> width)+j));
-
-    Point(dst->list[i * (img -> rImg -> width) + j],
-                  val,
-                  3, j, i);
-        }
-    }
-    free(val);
-}
-
 int assign3() {
 
     char *path = malloc(sizeof (char) * 50);
@@ -32,6 +9,12 @@ int assign3() {
     double optionDouble0;
     char optionChar0;
     FILE *fp;
+
+
+    printf("random seed please:): ");
+    scanf("%d", &optionInt0);
+
+    srand(optionInt0);
 
     printf("\n\nwhat type of image would you like (ppm: 1, pgm: 0): ");
     scanf("%d", &optionInt0);
@@ -54,7 +37,7 @@ int assign3() {
         struct ListPoint cluster;
         ListPoint(&imgList, 3, (data->rImg->width*data->rImg->height));
         rgbIMGToListPoint(data, &imgList);
-        cluster = *genRandClusterImg(data->bImg, optionInt1, 3);
+        genRandClusterImg(data->bImg, &cluster, optionInt1, 3);
 
         rgbImg *out = copyRgbImg(data);
 
@@ -74,6 +57,9 @@ int assign3() {
 
             fclose(fp);
         }
+        free(path);
+        destroyListPoint(imgList);
+        destroyListPoint(cluster);
         destroyRgbImg(out);
         destroyRgbImg(data);
     }

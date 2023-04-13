@@ -1,23 +1,25 @@
 #include <stdlib.h>
 #include "helperFun.h"
 #include <math.h>
+#include "stdio.h"
 
 void destroyListPoint(struct ListPoint listPoint){
     for (int i = 0; i < listPoint.size; ++i) {
         free(listPoint.list[i]);
-        free(listPoint.list);
     }
+    free(listPoint.list);
 }
 
 void Point(double *dst, const double* vals, int size, int x, int y){
     dst[0] = (double) x;
     dst[1] = (double) y;
     for (int i = 2; i < size + 2; ++i) {
-        dst[i] = vals[i];
+        dst[i] = vals[i-2];
     }
 }
 
 void initZeroList(struct ListPoint *dst, int pointSize, int size){
+    dst->list = malloc(sizeof(double*) * (size));
     dst -> pointSize = pointSize;
     dst -> size = size;
     for (int i = 0; i < size; ++i) {
@@ -27,9 +29,13 @@ void initZeroList(struct ListPoint *dst, int pointSize, int size){
         }
     }
 }
-
+/*
+void calla(struct ListPoint *dst, int pointSize, int size){
+    dst
+}
+*/
 void ListPoint(struct ListPoint *dst, int pointSize, int size){
-    dst->list = malloc(sizeof(double*) * (size));
+    dst->list = (double**) malloc(sizeof(double*) * (size));
     for (int i = 0; i < size; ++i) {
         dst->list[i] = malloc(sizeof (double ) * (pointSize + 2));
     }
@@ -65,23 +71,40 @@ inline int minimumDistance(double *point, struct ListPoint list, int withPos){
     return p;
 }
 
+void rgbIMGToListPoint(rgbImg *img, struct ListPoint *dst){
+
+    double *val = malloc(3 * sizeof (double));
 
 
-struct ListPoint * genRandClusterImg(Img *img, int k, int pointSize){
 
-    struct ListPoint *cluster = malloc(sizeof (struct ListPoint));
-    initZeroList(cluster, pointSize, k);
+    for(int i = 0; i < (img -> rImg -> height); ++i){
+        for(int j = 0; j < (img -> rImg -> width); ++j){
+
+            val[0] = (double) *((img ->rImg)->data + (i*(img -> rImg -> width)+j));
+            val[1] = (double) *((img ->gImg)->data + (i*(img -> rImg -> width)+j));
+            val[2] = (double) *((img ->bImg)->data + (i*(img -> rImg -> width)+j));
+
+            Point(dst->list[i * (img -> rImg -> width) + j],
+                  val,
+                  3, j, i);
+        }
+    }
+    free(val);
+}
+
+void genRandClusterImg(Img *img, struct ListPoint *dst, int k, int pointSize){
+
+    initZeroList(dst, pointSize, k);
     double random[pointSize];
 
     for (int i = 0; i < k; ++i) {
         for (int j = 0; j < pointSize; ++j) {
-            random[j] = drand(0, 255);
+            random[j] = drand(1, 255);
         }
-        Point(cluster->list[i], random, pointSize,
-              (int)drand(0, img->width),
-              (int)drand(0, img->height));
+        Point(dst->list[i], random, pointSize,
+              (int)drand(1, img->width),
+              (int)drand(1, img->height));
     }
-    return cluster;
 }
 
 
@@ -103,7 +126,7 @@ void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, in
         for (int j = 0; j < Imglist->size; ++j) {
 
             temp = minimumDistance(Imglist->list[j], *cluster, withPos);
-            addPoints(Imglist->list[temp], tempList.list[temp], 1);
+            addPoints(Imglist->list[temp], tempList.list[temp], Imglist->pointSize);
 
         }
 
@@ -116,7 +139,9 @@ void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, in
             multiplyPoints(genDelta, tempList.list[j], tempList.pointSize);
             //move cluster centroid
             addPoints(cluster->list[j], tempList.list[j], tempList.pointSize);
+
         }
+        printf("%d\n", i);
     }
 
     destroyListPoint(tempList);
@@ -136,7 +161,7 @@ void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *clu
 
     for (int j = 0; j < src->size; ++j) {
         temp = minimumDistance(src->list[j], *cluster, withPos);
-        addPoints(src->list[j], tempList.list[temp], 1);
+        addPoints(src->list[j], tempList.list[temp], 3);
         pointNum[temp]++;
     }
 
@@ -149,7 +174,7 @@ void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *clu
 
     for (int j = 0; j < src->size; ++j) {
         temp = minimumDistance(src->list[j], *cluster, withPos);
-        outList.list[j] = tempList.list[temp];
+        copyPoint(tempList.list[temp], outList.list[j], 3);
     }
 
     for(int i = 0; i < dst -> rImg -> height; ++i){
@@ -158,6 +183,7 @@ void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *clu
             putVal(dst -> gImg, j, i,(unsigned char) outList.list[i*dst -> rImg -> width + j][3]);
             putVal(dst -> bImg, j, i,(unsigned char) outList.list[i*dst -> rImg -> width + j][4]);
         }
+
     }
 
     destroyListPoint(outList);
@@ -192,7 +218,7 @@ void listPointToImg(struct ListPoint *src, Img *dst, struct ListPoint *cluster, 
 
     for (int j = 0; j < src->size; ++j) {
         temp = minimumDistance(src->list[j], *cluster, withPos);
-        outList.list[j] = tempList.list[temp];
+        copyPoint(tempList.list[temp], outList.list[j], 1);
     }
 
     for(int i = 0; i < dst -> height; ++i){

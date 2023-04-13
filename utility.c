@@ -31,7 +31,7 @@ rgbImg *getRgbImg(){
 }
 
 inline void addPoints(const double *src, double *dst, int size){
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size+2; ++i) {
         dst[i] += src[i];
     }
 }
@@ -61,6 +61,12 @@ inline double distancePoints(double *a, double *b, int size, int withPos){
         sum += pow(a[withPos] - b[withPos], 2);
     }
     return sqrt(sum);
+}
+
+inline void copyPoint(const double *src, double *dst, int size){
+    for (int i = 0; i < size+2; ++i) {
+        dst[i] = src[i];
+    }
 }
 
 double drand ( double low, double high ) //took for a random forum https://cboard.cprogramming.com/c-programming/17939-random-double-numbers.html :)
