@@ -115,16 +115,16 @@ void ppmToArray(FILE *file, rgbImg* img);
 rgbImg* ppmtoRgbImg(FILE *pFile);
 
 //utility
-void addPoints(const double *src, double *dst, int size);
-void multiplyPoints(const double src, double *dst, int size);
-void dividePointCons(const double src, double *dst, int size);
+void addPoints( double *src, double *dst, int size);
+void multiplyPoints( double src, double *dst, int size);
+void dividePointCons( double src, double *dst, int size);
 double distancePoints(double *a, double *b, int size, int withPos);
 double drand( double low, double high );
 void nullDPoint(double *dst, int size);
 void nullList(struct ListPoint *list);
 Img* getImg();
 rgbImg *getRgbImg();
-void copyPoint(const double *src, double *dst, int size);
+void copyPoint( double *src, double *dst, int size);
 
 //kmean
 int minimumDistance(double *point, struct ListPoint list, int withPos);
@@ -137,7 +137,7 @@ void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *clu
 void listPointToImg(struct ListPoint *src, Img *dst, struct ListPoint *cluster, int withPos);
 
 void ListPoint(struct ListPoint *dst, int pointSize, int size);
-void Point(double *dst, const double* vals, int size, int x, int y);
+void Point(double *dst,  double* vals, int size, int x, int y);
 
 //assignments
 int assign1();

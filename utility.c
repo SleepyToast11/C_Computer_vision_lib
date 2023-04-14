@@ -30,19 +30,19 @@ rgbImg *getRgbImg(){
     return data;
 }
 
-inline void addPoints(const double *src, double *dst, int size){
+inline void addPoints( double *src, double *dst, int size){
     for (int i = 0; i < size+2; ++i) {
         dst[i] += src[i];
     }
 }
 
-inline void multiplyPoints(const double src, double *dst, int size){
+inline void multiplyPoints( double src, double *dst, int size){
     for (int i = 0; i < size; ++i) {
         dst[i] *= src;
     }
 }
 
-inline void dividePointCons(const double src, double *dst, int size){
+inline void dividePointCons( double src, double *dst, int size){
     for (int i = 0; i < size; ++i) {
         dst[i] /= src;
     }
@@ -63,7 +63,7 @@ inline double distancePoints(double *a, double *b, int size, int withPos){
     return sqrt(sum);
 }
 
-inline void copyPoint(const double *src, double *dst, int size){
+inline void copyPoint( double *src, double *dst, int size){
     for (int i = 0; i < size+2; ++i) {
         dst[i] = src[i];
     }

@@ -2,6 +2,7 @@
 #include "helperFun.h"
 #include <math.h>
 #include "stdio.h"
+#include <pthread.h>
 
 void destroyListPoint(struct ListPoint listPoint){
     for (int i = 0; i < listPoint.size; ++i) {
@@ -10,7 +11,7 @@ void destroyListPoint(struct ListPoint listPoint){
     free(listPoint.list);
 }
 
-void Point(double *dst, const double* vals, int size, int x, int y){
+void Point(double *dst, double* vals, int size, int x, int y){
     dst[0] = (double) x;
     dst[1] = (double) y;
     for (int i = 2; i < size + 2; ++i) {
@@ -107,7 +108,7 @@ void genRandClusterImg(Img *img, struct ListPoint *dst, int k, int pointSize){
     }
 }
 
-
+/*
 void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, int numberGen, double genDelta) {
 
     struct ListPoint tempList;
@@ -146,6 +147,43 @@ void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, in
 
     destroyListPoint(tempList);
 }
+*/
+
+void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, int numberGen, double genDelta) {
+
+    struct ListPoint tempList;
+    initZeroList(&tempList, cluster->pointSize, cluster->size);
+
+    int tempNum[cluster->size];
+
+    int temp;
+    double tempD[3], zeroPoint[3];
+    nullDPoint(zeroPoint, 3);
+
+    for (int i = 0; i < numberGen; ++i) {
+
+        nullDPoint(tempD, 3);
+        nullList(&tempList);
+
+        for (int j = 0; j < Imglist->size; ++j) {
+
+            temp = minimumDistance(Imglist->list[j], *cluster, withPos);
+            addPoints(Imglist->list[temp], tempList.list[temp], Imglist->pointSize);
+            tempNum[temp]++;
+        }
+
+        for (int j = 0; j < cluster->size; ++j) {
+            //normalize
+            dividePointCons(tempNum[j],
+                            tempList.list[j],
+                            cluster->pointSize);
+        }
+        printf("%d\n", i);
+    }
+
+    destroyListPoint(tempList);
+}
+
 
 void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *cluster, int withPos){
 

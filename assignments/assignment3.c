@@ -4,10 +4,9 @@
 
 int assign3() {
 
-    char *path = malloc(sizeof (char) * 50);
-    int optionInt0, optionInt1, optionInt2;
+    char *path = malloc(sizeof(char) * 50);
+    int optionInt0, optionInt1, optionInt2, optionInt3, optionInt4;
     double optionDouble0;
-    char optionChar0;
     FILE *fp;
 
 
@@ -16,8 +15,17 @@ int assign3() {
 
     srand(optionInt0);
 
-    printf("\n\nwhat type of image would you like (ppm: 1, pgm: 0): ");
+    printf("\n\nwhat type of image would you like (ppm: 1, pgm: 0 or thread 16): ");
     scanf("%d", &optionInt0);
+
+    Img *data;
+    rgbImg *rgbData;
+
+    if (!optionInt0)
+        data = getImg();
+
+    else
+        rgbData = getRgbImg();
 
     printf("\n\nHow many k cluster: ");
     scanf("%d", &optionInt1);
@@ -28,41 +36,78 @@ int assign3() {
     printf("\n\nWhat delta between generation: ");
     scanf("%lf", &optionDouble0);
 
-    if(!optionInt0){
-        Img *data= getImg();
+    while(1) {
+        printf("\nHow many image out: ");
+        scanf("%d", &optionInt3);
 
-    } else{
-        rgbImg *data = getRgbImg();
-        struct ListPoint imgList;
-        struct ListPoint cluster;
-        ListPoint(&imgList, 3, (data->rImg->width*data->rImg->height));
-        rgbIMGToListPoint(data, &imgList);
-        genRandClusterImg(data->bImg, &cluster, optionInt1, 3);
+        printf("\nHow many generation to run (0 to quit): ");
+        scanf("%d", &optionInt4);
 
-        rgbImg *out = copyRgbImg(data);
+        if(!optionInt4)
+            break;
 
-        while(1){
-            printf("\nHow many generation to run (0 to quit): ");
-            scanf("%d", &optionInt0);
-            if(!optionInt0)
-                break;
+        for (int i = 0; i < optionInt3; ++i) {
 
-            kmean(&imgList, &cluster, optionInt2, optionInt0, optionDouble0);
+            if (!optionInt0) {
+                struct ListPoint imgList;
+                struct ListPoint cluster;
+                ListPoint(&imgList, 3, (data->width * data->height));
+                IMGToListPoint(data, &imgList);
+                genRandClusterImg(data, &cluster, optionInt1, 3);
 
-            listPointToRgbImg(&imgList, out, &cluster, optionInt2);
+                Img *out = copyImg(data);
 
-            fp = fopen("output/threshold.pgm", "w");
 
-            rgbImgToPpm(fp, out);
+                kmean(&imgList, &cluster, optionInt2, optionInt4, optionDouble0);
 
-            fclose(fp);
+                listPointToImg(&imgList, out, &cluster, optionInt2);
+
+                sprintf(path, "out%d.pgm", i);
+
+                fp = fopen(path, "w");
+
+                ImgToPgm(fp, out);
+
+                fclose(fp);
+
+                destroyListPoint(imgList);
+                destroyListPoint(cluster);
+                destroyImg(out);
+            } else {
+
+                struct ListPoint imgList;
+                struct ListPoint cluster;
+                ListPoint(&imgList, 3, (rgbData->rImg->width * rgbData->rImg->height));
+                rgbIMGToListPoint(rgbData, &imgList);
+                genRandClusterImg(rgbData->bImg, &cluster, optionInt1, 3);
+
+                rgbImg *out = copyRgbImg(rgbData);
+
+                kmean(&imgList, &cluster, optionInt2, optionInt4, optionDouble0);
+
+                listPointToRgbImg(&imgList, out, &cluster, optionInt2);
+
+                sprintf(path, "out%d.ppm", i);
+
+                fp = fopen(path, "w");
+
+                rgbImgToPpm(fp, out);
+
+                fclose(fp);
+
+
+                destroyListPoint(imgList);
+                destroyListPoint(cluster);
+                destroyRgbImg(out);
+            }
         }
-        free(path);
-        destroyListPoint(imgList);
-        destroyListPoint(cluster);
-        destroyRgbImg(out);
-        destroyRgbImg(data);
     }
+    if (!optionInt0)
+        destroyImg(data);
 
+    else
+        destroyRgbImg(data);
+
+    free(path);
     return 0;
 }
