@@ -2,6 +2,7 @@
 #include "helperFun.h"
 #include <math.h>
 #include "stdio.h"
+#include <pthread.h>
 
 void destroyListPoint(struct ListPoint listPoint){
     for (int i = 0; i < listPoint.size; ++i) {
@@ -10,7 +11,7 @@ void destroyListPoint(struct ListPoint listPoint){
     free(listPoint.list);
 }
 
-void Point(double *dst, const double* vals, int size, int x, int y){
+void Point(double *dst, double* vals, int size, int x, int y){
     dst[0] = (double) x;
     dst[1] = (double) y;
     for (int i = 2; i < size + 2; ++i) {
@@ -50,6 +51,7 @@ void IMGToListPoint(Img *img, struct ListPoint *dst){
     double val[1];
     for(int i = 0; i < img -> height; i++){
         for(int j = 0; j < img -> width; j++){
+            val[0] = (double) *((img)->data + (i*(img -> width)+j));
             Point(dst->list[i * (img -> width) + j],
                   val,
                   1, j, i);
@@ -107,7 +109,7 @@ void genRandClusterImg(Img *img, struct ListPoint *dst, int k, int pointSize){
     }
 }
 
-
+/*
 void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, int numberGen, double genDelta) {
 
     struct ListPoint tempList;
@@ -146,6 +148,47 @@ void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, in
 
     destroyListPoint(tempList);
 }
+*/
+
+void nullInt(int *src, int size){
+    for (int i = 0; i < size; ++i) {
+        src[i] = 0;
+    }
+}
+
+void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, int numberGen, double genDelta) {
+
+    struct ListPoint tempList;
+    initZeroList(&tempList, cluster->pointSize, cluster->size);
+
+    int tempNum[cluster->size];
+
+    int temp;
+
+    for (int i = 0; i < numberGen; ++i) {
+
+        nullInt(tempNum, cluster->size);
+        nullList(&tempList);
+
+        for (int j = 0; j < Imglist->size; ++j) {
+
+            temp = minimumDistance(Imglist->list[j], *cluster, withPos);
+            addPoints(Imglist->list[j], tempList.list[temp], Imglist->pointSize);
+            tempNum[temp]++;
+        }
+
+        for (int j = 0; j < cluster->size; ++j) {
+            dividePointCons(tempNum[j],
+                            tempList.list[j],
+                            cluster->pointSize);
+            copyPoint(tempList.list[j], cluster->list[j], cluster->pointSize);
+        }
+        printf("%d\n", i);
+    }
+
+    destroyListPoint(tempList);
+}
+
 
 void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *cluster, int withPos){
 
@@ -192,42 +235,43 @@ void listPointToRgbImg(struct ListPoint *src, rgbImg *dst, struct ListPoint *clu
 
 void listPointToImg(struct ListPoint *src, Img *dst, struct ListPoint *cluster, int withPos){
 
-    struct ListPoint tempList;
-    ListPoint(&tempList, cluster->pointSize, cluster->size);
-    initZeroList(&tempList, cluster->pointSize, cluster->size);
+        struct ListPoint tempList;
+        initZeroList(&tempList, cluster->pointSize, cluster->size);
 
-    int temp;
+        int temp;
 
-    int pointNum[cluster->size];
-    for (int i = 0; i < cluster->size; ++i) {
-        pointNum[i] = 0;
-    }
-
-    for (int j = 0; j < src->size; ++j) {
-        temp = minimumDistance(src->list[j], *cluster, withPos);
-        addPoints(src->list[j], tempList.list[temp], 1);
-        pointNum[temp]++;
-    }
-
-    for (int i = 0; i < tempList.size; ++i) {
-        dividePointCons(pointNum[i], tempList.list[i], 3);
-    }
-
-    struct ListPoint outList;
-    ListPoint(&outList, src->pointSize, src->size);
-
-    for (int j = 0; j < src->size; ++j) {
-        temp = minimumDistance(src->list[j], *cluster, withPos);
-        copyPoint(tempList.list[temp], outList.list[j], 1);
-    }
-
-    for(int i = 0; i < dst -> height; ++i){
-        for(int j = 0; j < dst -> width; ++j){
-            putVal(dst, j, i,(unsigned char) outList.list[i*dst -> width + j][2]);
+        int pointNum[cluster->size];
+        for (int i = 0; i < cluster->size; ++i) {
+            pointNum[i] = 0;
         }
-    }
 
-    destroyListPoint(outList);
-    destroyListPoint(tempList);
+        for (int j = 0; j < src->size; ++j) {
+            temp = minimumDistance(src->list[j], *cluster, withPos);
+            addPoints(src->list[j], tempList.list[temp], 1);
+            pointNum[temp]++;
+        }
+
+        for (int i = 0; i < tempList.size; ++i) {
+            dividePointCons(pointNum[i], tempList.list[i], 1);
+        }
+
+        struct ListPoint outList;
+        ListPoint(&outList, src->pointSize, src->size);
+
+        for (int j = 0; j < src->size; ++j) {
+            temp = minimumDistance(src->list[j], *cluster, withPos);
+            copyPoint(tempList.list[temp], outList.list[j], 1);
+        }
+
+        for(int i = 0; i < dst -> height; ++i){
+            for(int j = 0; j < dst  -> width; ++j){
+                putVal(dst , j, i,(unsigned char) outList.list[i*dst -> width + j][2]);
+                }
+
+        }
+
+        destroyListPoint(outList);
+        destroyListPoint(tempList);
 }
+
 

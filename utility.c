@@ -30,20 +30,20 @@ rgbImg *getRgbImg(){
     return data;
 }
 
-inline void addPoints(const double *src, double *dst, int size){
+inline void addPoints( double *src, double *dst, int size){
     for (int i = 0; i < size+2; ++i) {
         dst[i] += src[i];
     }
 }
 
-inline void multiplyPoints(const double src, double *dst, int size){
+inline void multiplyPoints( double src, double *dst, int size){
     for (int i = 0; i < size; ++i) {
         dst[i] *= src;
     }
 }
 
-inline void dividePointCons(const double src, double *dst, int size){
-    for (int i = 0; i < size; ++i) {
+inline void dividePointCons( double src, double *dst, int size){
+    for (int i = 0; i < size + 2; ++i) {
         dst[i] /= src;
     }
 }
@@ -63,15 +63,15 @@ inline double distancePoints(double *a, double *b, int size, int withPos){
     return sqrt(sum);
 }
 
-inline void copyPoint(const double *src, double *dst, int size){
+inline void copyPoint( double *src, double *dst, int size){
     for (int i = 0; i < size+2; ++i) {
         dst[i] = src[i];
     }
 }
 
-double drand ( double low, double high ) //took for a random forum https://cboard.cprogramming.com/c-programming/17939-random-double-numbers.html :)
+double drand ( double low, double high )
 {
-    return ( (double)rand() * ( high - low ) ) / (double)RAND_MAX + low;
+    return  (double)((rand() * ( high - low ) ) / (double)RAND_MAX + low);
 }
 
 inline void nullDPoint(double *dst, int size){
@@ -82,7 +82,7 @@ inline void nullDPoint(double *dst, int size){
 
 inline void nullList(struct ListPoint *list){
     for (int i = 0; i < list->size; ++i) {
-        nullDPoint(list->list[i], list->pointSize);
+        nullDPoint(list->list[i], list->pointSize + 2);
     }
 }
 
