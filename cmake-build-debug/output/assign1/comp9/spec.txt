@@ -1,0 +1,11 @@
+BoundBox starting top left going clockwise
+[25, 136], [26, 136], [34, 147], [34, 151], [28, 156], [24, 156], [18, 150], [18, 148]
+centroid row: 146.68
+centroid col: 26.08
+area: 208
+second order moment row: 0.00
+second order moment col: 0.00
+second order moment mix: 0.00
+perimeter: 68.01
+C1: 22.24
+C2: -nan
