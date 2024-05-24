@@ -1,2 +1,6 @@
 # Project exclude paths
 /CMakeFiles/
+/output/
+/assign3.odt
+Assignment_2_sleepySquirle.odt
+Assignment_2_sleepySquirle.pdf
