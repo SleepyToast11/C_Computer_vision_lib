@@ -1,3 +1,0 @@
-/home/jsparnaay/CLionProjects/C_Computer_vision_lib/cmake-build-debug/CMakeFiles/funtimes.dir
-/home/jsparnaay/CLionProjects/C_Computer_vision_lib/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/jsparnaay/CLionProjects/C_Computer_vision_lib/cmake-build-debug/CMakeFiles/rebuild_cache.dir
