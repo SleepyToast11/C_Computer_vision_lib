@@ -43,11 +43,12 @@ inline void multiplyPoints( double src, double *dst, int size){
 }
 
 inline void dividePointCons( double src, double *dst, int size){
+    if(src == 0)
+            return; //is the same as letting the point be
     for (int i = 0; i < size + 2; ++i) {
         dst[i] /= src;
     }
 }
-
 
 inline double distancePoints(double *a, double *b, int size, int withPos){
     double sum = 0;
@@ -70,8 +71,15 @@ inline void copyPoint( double *src, double *dst, int size){
 }
 
 double drand ( double low, double high )
-{
-    return  (double)((rand() * ( high - low ) ) / (double)RAND_MAX + low);
+    {
+    double range = (high - low);
+    double div = RAND_MAX / range;
+    if(low + (rand() / div) == -NAN) {
+
+        printf("crap");
+        exit(2);
+    }
+    return low + (((double) rand()) / div);
 }
 
 inline void nullDPoint(double *dst, int size){

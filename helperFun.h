@@ -127,7 +127,7 @@ rgbImg *getRgbImg();
 void copyPoint( double *src, double *dst, int size);
 
 //kmean
-int minimumDistance(double *point, struct ListPoint list, int withPos);
+int minimumDistance(double *point, struct ListPoint *list, int withPos);
 void kmean(struct ListPoint *Imglist, struct ListPoint *cluster, int withPos, int numberGen, double genDelta);
 void genRandClusterImg(Img *img, struct ListPoint *dst, int k, int pointSize);
 void rgbIMGToListPoint(rgbImg *img, struct ListPoint *dst);
@@ -139,7 +139,14 @@ void listPointToImg(struct ListPoint *src, Img *dst, struct ListPoint *cluster, 
 void ListPoint(struct ListPoint *dst, int pointSize, int size);
 void Point(double *dst,  double* vals, int size, int x, int y);
 
+//mean_shift.c
+void segmentation(Img *data, double kernel_bandwidth, int radius, int MAX_ITERATIONS);
+void meanShiftFilterRGB(rgbImg *data, int radius, int delta);
+void meanShiftFilter(Img *data, int radius, int delta);
+void rgbSegmentation(rgbImg *data, double kernel_bandwidth, int radius, int MAX_ITERATIONS);
+
 //assignments
 int assign1();
 int assign2();
 int assign3();
+int assign4();

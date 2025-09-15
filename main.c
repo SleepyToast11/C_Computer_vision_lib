@@ -13,7 +13,9 @@
  */
 
 int main() {
-
+    int i = 0;
+    int j = 1;
+    i = j+i;
     printf("Hello, which assignment would you want?");
     int option;
     scanf("%d", &option);
@@ -28,6 +30,8 @@ int main() {
             return assign2();
         case 3:
             return assign3();
+        case 4:
+            return assign4();
 
         default:
             printf("only 1 or 2 is possible for now");

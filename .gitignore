@@ -1,9 +1,3 @@
 # Project exclude paths
-/cmake-build-debug/
 /CMakeFiles/
-/output/
-/image/
-assign3.odt
-Assignment_2_sleepySquirle.odt
-Assignment_2_sleepySquirle.pdf
-binaryThreshholds.txt
+/cmake-build-debug/

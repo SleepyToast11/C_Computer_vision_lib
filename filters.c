@@ -126,9 +126,7 @@ void smoothingFilter(Img *img, int size, int function(Img* img, int i, int j, st
 
             }
         }
-
         destroyImg(data);
-
     }
 
 }

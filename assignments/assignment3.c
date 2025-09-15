@@ -15,7 +15,7 @@ int assign3() {
 
     srand(optionInt0);
 
-    printf("\n\nwhat type of image would you like (ppm: 1, pgm: 0 or thread 16): ");
+    printf("\n\nwhat type of image would you like (ppm: 1, pgm: 0): ");
     scanf("%d", &optionInt0);
 
     Img *data;
@@ -32,11 +32,6 @@ int assign3() {
 
     printf("\n\nWith (1) or without position (0): ");
     scanf("%d", &optionInt2);
-
-    ///////////////////Difference
-    //printf("\n\nWhat delta between generation: ");
-    //scanf("%lf", &optionDouble0);
-    //////////////////
 
     while(1) {
         printf("\nHow many image out: ");
@@ -87,6 +82,12 @@ int assign3() {
 
                 kmean(&imgList, &cluster, optionInt2, optionInt4, optionDouble0);
 
+                for (int j = 0; j < cluster.size; ++j) {
+                    printf("\ncluster %d: \n\t", j);
+                    for (int k = 0; k < cluster.pointSize + 2; ++k) {
+                        printf("%2lf, ", cluster.list[j][k]);
+                    }
+                }
                 listPointToRgbImg(&imgList, out, &cluster, optionInt2);
 
                 sprintf(path, "out%d.ppm", i);
